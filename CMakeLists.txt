@@ -35,6 +35,9 @@ else()
     # At least for now.
     add_compile_options(-fms-extensions)
 endif()
+if (EMSCRIPTEN)
+    add_compile_options(-msimd128)
+endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(TARGET_ARCHITECTURE x64)
@@ -76,8 +79,11 @@ include_directories(dependencies/libraries/vulkan/include)
 # =========================================================
 # SDL2
 
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
+# Emscripten provides these by default, but it fails if we try to find them
+if (NOT EMSCRIPTEN)
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
+endif()
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 # =========================================================
@@ -369,10 +375,11 @@ if(ENABLE_OPENGL)
         include/yds_opengl_sdl_context.h
     )
 
-    target_link_libraries(delta-core PUBLIC
-        delta-core-opengl
-        OpenGL32
-    )
+    if (NOT EMSCRIPTEN)
+        target_link_libraries(delta-core PUBLIC
+            OpenGL
+        )
+    endif()
 endif()
 
 if (ENABLE_VULKAN)

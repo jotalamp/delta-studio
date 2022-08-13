@@ -5,7 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-#if !__linux__
+#if !(__linux__ || __EMSCRIPTEN__)
 #include <gl/wglext.h>
 #endif
 

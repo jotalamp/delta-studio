@@ -2,7 +2,7 @@
 
 #include "yds_window.h"
 
-#include <SDL2/SDL_video.h>
+#include <SDL_video.h>
 
 class ysSdlWindowSystem;
 

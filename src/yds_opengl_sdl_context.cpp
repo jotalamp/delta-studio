@@ -4,6 +4,8 @@
 #include "../include/yds_sdl_window.h"
 #include "../include/yds_sdl_window_system.h"
 
+#include <SDL_video.h>
+
 ysOpenGLSDLContext::ysOpenGLSDLContext() : ysOpenGLVirtualContext(ysWindowSystem::Platform::Sdl) {
     m_device = nullptr;
 }
