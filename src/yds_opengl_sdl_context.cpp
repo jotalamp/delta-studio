@@ -24,10 +24,18 @@ ysError ysOpenGLSDLContext::CreateRenderingContext(ysOpenGLDevice *device, ysWin
     ysSdlWindow *sdlWindow = static_cast<ysSdlWindow *>(window);
 
     // TODO: more options here to match Windows impl
+#if __EMSCRIPTEN__
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
     m_context = SDL_GL_CreateContext(sdlWindow->m_window);
+    printf("GL Version={%s}\n", glGetString(GL_VERSION));
+    printf("GLSL Version={%s}\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     LoadAllExtensions();
 
@@ -86,9 +94,12 @@ ysError ysOpenGLSDLContext::SetContext(ysRenderingContext *realContext) {
     YDS_ERROR_DECLARE("SetContext");
 
     ysOpenGLSDLContext *realOpenglContext = static_cast<ysOpenGLSDLContext *>(realContext);
-    ysSdlWindow *sdlWindow = static_cast<ysSdlWindow *>(realOpenglContext->m_targetWindow);
 
+#if __EMSCRIPTEN__
+    // Ignore it, assume we've already bound the right context
+#else
     if (realContext != nullptr) {
+        ysSdlWindow *sdlWindow = static_cast<ysSdlWindow *>(realOpenglContext->m_targetWindow);
         int result = SDL_GL_MakeCurrent(sdlWindow->m_window, realOpenglContext->m_context);
         if (result != 0) {
             return YDS_ERROR_RETURN(ysError::CouldNotActivateContext);
@@ -96,6 +107,7 @@ ysError ysOpenGLSDLContext::SetContext(ysRenderingContext *realContext) {
     } else {
         SDL_GL_MakeCurrent(NULL, NULL);
     }
+#endif
 
     return YDS_ERROR_RETURN(ysError::None);
 }
