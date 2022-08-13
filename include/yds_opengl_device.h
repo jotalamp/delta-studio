@@ -62,6 +62,8 @@ public:
     virtual ysError AttachShader(ysShaderProgram *targetProgram, ysShader *shader);
     virtual ysError LinkProgram(ysShaderProgram *program);
     virtual ysError UseShaderProgram(ysShaderProgram *);
+    virtual ysError SetConstantBufferSlot(ysShaderProgram *program, const char *name, int slot);
+    virtual ysError SetTextureSlot(ysShaderProgram *program, const char *name, int slot);
 
     // Input Layouts 
     virtual ysError CreateInputLayout(ysInputLayout **newLayout, ysShader *shader, const ysRenderGeometryFormat *format);

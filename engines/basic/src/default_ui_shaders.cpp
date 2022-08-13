@@ -24,12 +24,20 @@ ysError dbasic::DefaultUiShaders::Initialize(ysDevice *device, ysRenderTarget *r
     mainStage->SetShaderProgram(shaderProgram);
     mainStage->SetType(ShaderStage::Type::FullPass);
 
+    const int ScreenVariablesSlot = 0;
+    const int ObjectVariablesSlot = 1;
+    const int LightingSlot = 3;
+
+    mainStage->SetConstantBufferSlot("ScreenVariables", ScreenVariablesSlot);
+    mainStage->SetConstantBufferSlot("ObjectVariables", ObjectVariablesSlot);
+    mainStage->SetConstantBufferSlot("Lighting", LightingSlot);
+
     mainStage->NewConstantBuffer<ShaderScreenVariables>(
-        "DefaultUiShaders::ScreenData", 0, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shaderScreenVariables);
+        "DefaultUiShaders::ScreenData", ScreenVariablesSlot, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shaderScreenVariables);
     mainStage->NewConstantBuffer<ShaderObjectVariables>(
-        "DefaultUiShaders::ObjectData", 1, ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables);
+        "DefaultUiShaders::ObjectData", ObjectVariablesSlot, ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables);
     mainStage->NewConstantBuffer<LightingControls>(
-        "DefaultUiShaders::LightingData", 3, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_lightingControls);
+        "DefaultUiShaders::LightingData", LightingSlot, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_lightingControls);
 
     return YDS_ERROR_RETURN(ysError::None);
 }

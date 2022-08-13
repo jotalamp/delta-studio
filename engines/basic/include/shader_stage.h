@@ -56,6 +56,8 @@ namespace dbasic {
         ysError Initialize(ysDevice *device, const std::string &name);
         ysError Destroy();
 
+        void SetConstantBufferSlot(const char *name, int slot) const;
+
         template <typename T_ConstantData>
         ysError NewConstantBuffer(
             const std::string &name, 
@@ -113,6 +115,7 @@ namespace dbasic {
         ysError SetInput(ysRenderTarget *renderTarget, int slot);
         int GetInputCount() const { return m_inputs.GetNumObjects(); }
 
+        void SetTextureSlot(const char *name, int slot) const;
         ysError AddTextureInput(int slot, TextureHandle *handle);
         ysError BindTexture(ysTexture *texture, TextureHandle handle);
         int GetTextureInputCount() const { return m_textureInputs.GetNumObjects(); }

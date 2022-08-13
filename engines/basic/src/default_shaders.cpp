@@ -34,14 +34,24 @@ ysError dbasic::DefaultShaders::Initialize(ShaderSet *shaderSet, ysRenderTarget 
     m_mainStage->SetShaderProgram(shaderProgram);
     m_mainStage->SetType(ShaderStage::Type::FullPass);
 
-    m_mainStage->NewConstantBuffer<ShaderScreenVariables>(
-        "Buffer::ScreenData", 0, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shaderScreenVariables);
-    m_mainStage->NewConstantBuffer<ShaderObjectVariables>(
-        "Buffer::ObjectData", 1, ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables);
-    m_mainStage->NewConstantBuffer<LightingControls>(
-        "Buffer::LightingData", 3, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_lightingControls);
+    const int ScreenVariablesSlot = 0;
+    const int ObjectVariablesSlot = 1;
+    const int LightingSlot = 3;
+    const int TextureSlot = 0;
 
-    m_mainStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
+    m_mainStage->SetConstantBufferSlot("ScreenVariables", ScreenVariablesSlot);
+    m_mainStage->SetConstantBufferSlot("ObjectVariables", ObjectVariablesSlot);
+    m_mainStage->SetConstantBufferSlot("Lighting", LightingSlot);
+    m_mainStage->SetTextureSlot("diffuseTex", TextureSlot);
+
+    m_mainStage->NewConstantBuffer<ShaderScreenVariables>(
+        "Buffer::ScreenData", ScreenVariablesSlot, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shaderScreenVariables);
+    m_mainStage->NewConstantBuffer<ShaderObjectVariables>(
+        "Buffer::ObjectData", ObjectVariablesSlot, ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables);
+    m_mainStage->NewConstantBuffer<LightingControls>(
+        "Buffer::LightingData", LightingSlot, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_lightingControls);
+
+    m_mainStage->AddTextureInput(TextureSlot, &m_mainStageDiffuseTexture);
 
     return YDS_ERROR_RETURN(ysError::None);
 }

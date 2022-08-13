@@ -50,6 +50,14 @@ ysError dbasic::ShaderStage::Destroy() {
 	return YDS_ERROR_RETURN(ysError::None);
 }
 
+void dbasic::ShaderStage::SetConstantBufferSlot(const char *name, int slot) const {
+	m_device->SetConstantBufferSlot(m_shaderProgram, name, slot);
+}
+
+void dbasic::ShaderStage::SetTextureSlot(const char *name, int slot) const {
+	m_device->SetTextureSlot(m_shaderProgram, name, slot);
+}
+
 bool dbasic::ShaderStage::DependsOn(ysRenderTarget *target) const {
     return false;
 }

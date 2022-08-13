@@ -176,6 +176,12 @@ public:
     // Enable a shader program
     virtual ysError UseShaderProgram(ysShaderProgram *);
 
+    // Set a constant buffer's slot binding location at runtime (no-op on backends that don't need this)
+    virtual ysError SetConstantBufferSlot(ysShaderProgram *program, const char *name, int slot) = 0;
+
+    // Set a texture's slot binding location at runtime (no-op on backends that don't need this)
+    virtual ysError SetTextureSlot(ysShaderProgram *program, const char *name, int slot) = 0;
+
 
     /* Input Layouts */
 

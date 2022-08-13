@@ -868,6 +868,33 @@ ysError ysOpenGLDevice::UseShaderProgram(ysShaderProgram *program) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
+ysError ysOpenGLDevice::SetConstantBufferSlot(ysShaderProgram *program, const char *name, int slot) {
+    YDS_ERROR_DECLARE("SetConstantBufferSlot");
+
+    ysOpenGLShaderProgram *openglProgram = static_cast<ysOpenGLShaderProgram *>(program);
+    auto index = m_realContext->glGetUniformBlockIndex(openglProgram->m_handle, name);
+
+    if (index == GL_INVALID_INDEX) return YDS_ERROR_RETURN(ysError::InvalidParameter);
+
+    m_realContext->glUniformBlockBinding(openglProgram->m_handle, index, slot);
+
+    return YDS_ERROR_RETURN(ysError::None);
+}
+
+ysError ysOpenGLDevice::SetTextureSlot(ysShaderProgram *program, const char *name, int slot) {
+    YDS_ERROR_DECLARE("SetTextureSlot");
+
+    ysOpenGLShaderProgram *openglProgram = static_cast<ysOpenGLShaderProgram *>(program);
+    auto location = m_realContext->glGetUniformLocation(openglProgram->m_handle, name);
+
+    if (location < 0) return YDS_ERROR_RETURN(ysError::InvalidParameter);
+
+    m_realContext->glUseProgram(openglProgram->m_handle); // TODO: state tracking here
+    m_realContext->glUniform1i(location, slot);
+
+    return YDS_ERROR_RETURN(ysError::None);
+}
+
 ysError ysOpenGLDevice::CreateShaderProgram(ysShaderProgram **program) {
     YDS_ERROR_DECLARE("CreateShaderProgram");
 

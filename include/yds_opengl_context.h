@@ -68,6 +68,7 @@ public:
     PFNGLBINDFRAGDATALOCATIONPROC glBindFragDataLocation = nullptr;
     PFNGLGETFRAGDATALOCATIONPROC glGetFragDataLocation = nullptr;
     PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = nullptr;
+    PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex = nullptr;
     PFNGLGETSHADERIVPROC glGetShaderiv = nullptr;
     PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = nullptr;
     PFNGLDRAWBUFFERSPROC glDrawBuffers = nullptr;
@@ -83,6 +84,8 @@ public:
 
     PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv = nullptr;
     PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv = nullptr;
+
+    PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding = nullptr;
 
     PFNGLGETPROGRAMIVPROC glGetProgramiv = nullptr;
     PFNGLGETACTIVEUNIFORMNAMEPROC glGetActiveUniformName = nullptr;

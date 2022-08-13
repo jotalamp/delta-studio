@@ -28,12 +28,20 @@ ysError dbasic::ConsoleShaders::Initialize(
     m_mainStage->SetFlagBit(3);
     m_mainStage->SetClearTarget(false);
 
-    m_mainStage->NewConstantBuffer<ShaderScreenVariables>(
-        "DefaultUiShaders::ScreenData", 0, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shaderScreenVariables);
-    m_mainStage->NewConstantBuffer<ConsoleShaderObjectVariables>(
-        "DefaultUiShaders::ObjectData", 1, ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables);
+    const int ScreenVariablesSlot = 0;
+    const int ObjectVariablesSlot = 1;
+    const int TextureSlot = 0;
 
-    m_mainStage->AddTextureInput(0, &m_textureHandle);
+    m_mainStage->SetConstantBufferSlot("ScreenVariables", ScreenVariablesSlot);
+    m_mainStage->SetConstantBufferSlot("ObjectVariables", ObjectVariablesSlot);
+    m_mainStage->SetTextureSlot("diffuseTex", TextureSlot);
+
+    m_mainStage->NewConstantBuffer<ShaderScreenVariables>(
+        "DefaultUiShaders::ScreenData", ScreenVariablesSlot, ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shaderScreenVariables);
+    m_mainStage->NewConstantBuffer<ConsoleShaderObjectVariables>(
+        "DefaultUiShaders::ObjectData", ObjectVariablesSlot, ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables);
+
+    m_mainStage->AddTextureInput(TextureSlot, &m_textureHandle);
 
     return YDS_ERROR_RETURN(ysError::None);
 }
