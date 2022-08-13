@@ -1,5 +1,15 @@
 #include "../include/yds_timing.h"
 
+ysTimingSystem *ysTimingSystem::g_instance = nullptr;
+
+#if __EMSCRIPTEN__
+#include <emscripten.h>
+uint64_t SystemTime() {
+    return emscripten_get_now() * 1000;
+}
+#define __rdtsc() SystemTime()
+
+#else
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -7,8 +17,6 @@
 
 static bool qpcFlag;
 static LARGE_INTEGER qpcFrequency;
-
-ysTimingSystem *ysTimingSystem::g_instance = nullptr;
 
 uint64_t SystemTime() {
     if (qpcFlag) {
@@ -25,6 +33,7 @@ uint64_t SystemTime() {
         return (uint64_t)(timeGetTime() * 1000);
     }
 }
+#endif
 
 ysTimingSystem::ysTimingSystem() {
     SetPrecisionMode(Precision::Microsecond);
