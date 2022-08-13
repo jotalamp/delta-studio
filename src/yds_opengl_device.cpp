@@ -7,13 +7,16 @@
 #include "../include/yds_opengl_shader_program.h"
 #include "../include/yds_opengl_texture.h"
 
-#include "../include/yds_opengl_windows_context.h"
+// TODO: only include windows impl if we're on windows
+//#include "../include/yds_opengl_windows_context.h"
+#include "../include/yds_opengl_sdl_context.h"
 
 #include "OpenGL.h"
 #include <SDL.h>
 #include <SDL_image.h>
 
 #include "../include/yds_file.h"
+#include "../engines/basic/include/safe_string.h" // TODO: move this down into delta
 
 template<>
 ysDevice* ysDevice::CreateApiDevice<DeviceAPI::OpenGL4_0>() {
@@ -59,6 +62,7 @@ ysError ysOpenGLDevice::CreateRenderingContext(ysRenderingContext **context, ysW
     if (context == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     *context = nullptr;
 
+#if 0 // TODO: Windows
     if (window->GetPlatform() == ysWindowSystemObject::Platform::Windows) {
         ysOpenGLWindowsContext *newContext = m_renderingContexts.NewGeneric<ysOpenGLWindowsContext>();
         YDS_NESTED_ERROR_CALL(newContext->CreateRenderingContext(this, window, 4, 3));
@@ -73,7 +77,26 @@ ysError ysOpenGLDevice::CreateRenderingContext(ysRenderingContext **context, ysW
 
         return YDS_ERROR_RETURN(ysError::None);
     }
-    else {
+    else
+#endif
+#if 1 // TODO: SDL
+    if (window->GetPlatform() == ysWindowSystemObject::Platform::Sdl) {
+        ysOpenGLSDLContext *newContext = m_renderingContexts.NewGeneric<ysOpenGLSDLContext>();
+        YDS_NESTED_ERROR_CALL(newContext->CreateRenderingContext(this, window, 4, 3));
+
+        // TEMP
+        glFrontFace(GL_CCW);
+
+        SetFaceCulling(true);
+        SetFaceCullingMode(CullMode::Back);
+
+        *context = static_cast<ysRenderingContext *>(newContext);
+
+        return YDS_ERROR_RETURN(ysError::None);
+    }
+    else
+#endif
+    {
         return YDS_ERROR_RETURN_MSG(ysError::IncompatiblePlatforms, "Only Windows platforms are currently supported.");
     }
 }
