@@ -9,7 +9,7 @@ uint64_t SystemTime() {
 }
 #define __rdtsc() SystemTime()
 
-#else
+#elif _MSC_VER
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -33,6 +33,14 @@ uint64_t SystemTime() {
         return (uint64_t)(timeGetTime() * 1000);
     }
 }
+
+#else
+#include <SDL2/SDL.h>
+uint64_t SystemTime() {
+    return SDL_GetTicks() * 1000;
+}
+#define __rdtsc() SystemTime()
+
 #endif
 
 ysTimingSystem::ysTimingSystem() {
