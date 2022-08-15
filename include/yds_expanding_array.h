@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <new>
 
+// TODO
+#define __forceinline inline
+
 template<typename TYPE, int START_SIZE = 0, int ALIGNMENT = 1>
 class ysExpandingArray {
 public:

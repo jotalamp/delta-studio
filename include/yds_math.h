@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// TODO
+#define __forceinline inline
+
 // Extra Definitions
 
 #define _mm_replicate_x_ps(v) \
