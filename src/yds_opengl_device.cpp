@@ -19,7 +19,7 @@
 #include "../engines/basic/include/safe_string.h" // TODO: move this down into delta
 
 template<>
-ysDevice* ysDevice::CreateApiDevice<DeviceAPI::OpenGL4_0>() {
+ysDevice* ysDevice::CreateApiDevice<ysContextObject::DeviceAPI::OpenGL4_0>() {
     return new ysOpenGLDevice();
 }
 
