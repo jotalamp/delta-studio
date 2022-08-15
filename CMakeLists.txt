@@ -11,7 +11,7 @@ project(delta-studio)
 # Graphics APIs
 option(ENABLE_OPENGL "Enable the OpenGL graphics API" ON)
 cmake_dependent_option(ENABLE_D3D "Enable the Direct3D 10/11 graphics API" ON WIN32 OFF)
-option(ENABLE_VULKAN "Enable the Vulkan graphics API" ON)
+option(ENABLE_VULKAN "Enable the Vulkan graphics API" OFF)
 
 # Sound Systems
 cmake_dependent_option(ENABLE_DSOUND "Enable the DirectSound API" ON WIN32 OFF)
