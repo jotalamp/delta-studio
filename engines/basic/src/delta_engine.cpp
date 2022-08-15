@@ -176,8 +176,26 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
     return YDS_ERROR_RETURN(ysError::None);
 }
 
+#if 1 // HACK
+#include <SDL.h>
+static std::vector<Uint8> g_kb_state_now;
+static std::vector<Uint8> g_kb_state_prev;
+#endif
+
 ysError dbasic::DeltaEngine::StartFrame() {
     YDS_ERROR_DECLARE("StartFrame");
+
+#if 1 // HACK
+    {
+        // Read the current key state
+        int count = 0;
+        const auto *state = SDL_GetKeyboardState(&count);
+        // Move over the last frame's state and copy the new state
+        g_kb_state_prev.swap(g_kb_state_now);
+        g_kb_state_now.resize(count);
+        std::copy_n(state, count, g_kb_state_now.data());
+    }
+#endif
 
     m_uiRenderer.Reset();
 
@@ -537,10 +555,58 @@ void dbasic::DeltaEngine::SetConsoleColor(const ysVector &v) {
     m_consoleShaderObjectVariables.MulCol = ysMath::GetVector4(v);
 }
 
+#if 1 // HACK
+static bool was_down(const std::vector<Uint8> &state, ysKey::Code key) {
+    if (state.empty()) return false;
+
+    switch (key) {
+        case ysKey::Code::Escape: return state[SDL_SCANCODE_ESCAPE];
+        case ysKey::Code::A: return state[SDL_SCANCODE_A];
+        case ysKey::Code::B: return state[SDL_SCANCODE_B];
+        case ysKey::Code::C: return state[SDL_SCANCODE_C];
+        case ysKey::Code::D: return state[SDL_SCANCODE_D];
+        case ysKey::Code::E: return state[SDL_SCANCODE_E];
+        case ysKey::Code::F: return state[SDL_SCANCODE_F];
+        case ysKey::Code::G: return state[SDL_SCANCODE_G];
+        case ysKey::Code::H: return state[SDL_SCANCODE_H];
+        case ysKey::Code::I: return state[SDL_SCANCODE_I];
+        case ysKey::Code::J: return state[SDL_SCANCODE_J];
+        case ysKey::Code::K: return state[SDL_SCANCODE_K];
+        case ysKey::Code::L: return state[SDL_SCANCODE_L];
+        case ysKey::Code::M: return state[SDL_SCANCODE_M];
+        case ysKey::Code::N: return state[SDL_SCANCODE_N];
+        case ysKey::Code::O: return state[SDL_SCANCODE_O];
+        case ysKey::Code::P: return state[SDL_SCANCODE_P];
+        case ysKey::Code::Q: return state[SDL_SCANCODE_Q];
+        case ysKey::Code::R: return state[SDL_SCANCODE_R];
+        case ysKey::Code::S: return state[SDL_SCANCODE_S];
+        case ysKey::Code::T: return state[SDL_SCANCODE_T];
+        case ysKey::Code::U: return state[SDL_SCANCODE_U];
+        case ysKey::Code::V: return state[SDL_SCANCODE_V];
+        case ysKey::Code::W: return state[SDL_SCANCODE_W];
+        case ysKey::Code::X: return state[SDL_SCANCODE_X];
+        case ysKey::Code::Y: return state[SDL_SCANCODE_Y];
+        case ysKey::Code::Z: return state[SDL_SCANCODE_Z];
+        case ysKey::Code::Up: return state[SDL_SCANCODE_UP];
+        case ysKey::Code::Down: return state[SDL_SCANCODE_DOWN];
+        case ysKey::Code::Space: return state[SDL_SCANCODE_SPACE];
+        case ysKey::Code::N1: return state[SDL_SCANCODE_KP_1];
+        case ysKey::Code::N2: return state[SDL_SCANCODE_KP_2];
+        case ysKey::Code::N3: return state[SDL_SCANCODE_KP_3];
+        case ysKey::Code::N4: return state[SDL_SCANCODE_KP_4];
+        case ysKey::Code::N5: return state[SDL_SCANCODE_KP_5];
+        default: return false;
+    }
+}
+#endif
+
 bool dbasic::DeltaEngine::IsKeyDown(ysKey::Code key) {
     if (m_mainKeyboard != nullptr) {
         return m_mainKeyboard->IsKeyDown(key);
     }
+#if 1 // LAZY
+    return was_down(g_kb_state_now, key);
+#endif
 
     return false;
 }
@@ -549,6 +615,9 @@ bool dbasic::DeltaEngine::ProcessKeyDown(ysKey::Code key) {
     if (m_mainKeyboard != nullptr) {
         return m_mainKeyboard->ProcessKeyTransition(key);
     }
+#if 1 // LAZY
+    return was_down(g_kb_state_now, key) && !was_down(g_kb_state_prev, key);
+#endif
 
     return false;
 }
