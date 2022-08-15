@@ -71,6 +71,7 @@ public:
     PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex = nullptr;
     PFNGLGETSHADERIVPROC glGetShaderiv = nullptr;
     PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = nullptr;
+    PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = nullptr;
     PFNGLDRAWBUFFERSPROC glDrawBuffers = nullptr;
 
     PFNGLUNIFORM4FPROC glUniform4f = nullptr;
