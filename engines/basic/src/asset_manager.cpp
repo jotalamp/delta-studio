@@ -544,6 +544,7 @@ dbasic::TextureAsset *dbasic::AssetManager::GetTexture(const char *name) {
 ysError dbasic::AssetManager::LoadAudioFile(const char *fname, const char *name) {
     YDS_ERROR_DECLARE("LoadAudioFile");
 
+#if 0 // HACK
     ysWindowsAudioWaveFile waveFile;
     waveFile.OpenFile(fname);
 
@@ -558,6 +559,7 @@ ysError dbasic::AssetManager::LoadAudioFile(const char *fname, const char *name)
     AudioAsset *newAsset = m_audioAssets.New();
     newAsset->SetBuffer(newBuffer);
     newAsset->SetName(name);
+#endif
 
     return YDS_ERROR_RETURN(ysError::None);
 }

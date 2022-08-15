@@ -117,22 +117,26 @@ ysError dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings
         mainMonitor));
     m_gameWindow->AttachEventHandler(&m_windowHandler);
 
+#if 0 // HACK
     YDS_NESTED_ERROR_CALL(ysInputSystem::CreateInputSystem(&m_inputSystem, ysWindowSystemObject::Platform::Windows));
     m_windowSystem->AssignInputSystem(m_inputSystem);
     m_inputSystem->Initialize();
 
     m_mainKeyboard = m_inputSystem->GetKeyboardAggregator();
     m_mainMouse = m_inputSystem->GetMouseAggregator();
+#endif
 
     // Create the graphics device
     YDS_NESTED_ERROR_CALL(ysDevice::CreateDevice(&m_device, settings.API));
     YDS_NESTED_ERROR_CALL(m_device->InitializeDevice());
 
+#if 0 // HACK
     // Create the audio device
     YDS_NESTED_ERROR_CALL(ysAudioSystem::CreateAudioSystem(&m_audioSystem, ysAudioSystem::API::DirectSound8));
     m_audioSystem->EnumerateDevices();
     m_audioDevice = m_audioSystem->GetPrimaryDevice();
     m_audioSystem->ConnectDevice(m_audioDevice, m_gameWindow);
+#endif
 
     // Create the rendering context
     YDS_NESTED_ERROR_CALL(m_device->CreateRenderingContext(&m_renderingContext, m_gameWindow));
@@ -181,7 +185,9 @@ ysError dbasic::DeltaEngine::StartFrame() {
     m_breakdownTimer.StartFrame();
     m_breakdownTimer.StartMeasurement(FrameBreakdownFull);
 
+#if 0 // HACK
     m_audioDevice->UpdateAudioSources();
+#endif
     m_windowSystem->ProcessMessages();
     m_timingSystem->Update();
 
@@ -504,10 +510,12 @@ ysError dbasic::DeltaEngine::LoadFont(Font **font, const char *path, int size, i
 ysError dbasic::DeltaEngine::PlayAudio(AudioAsset *audio) {
     YDS_ERROR_DECLARE("PlayAudio");
 
+#if 0 // HACK
     ysAudioSource *newSource = m_audioDevice->CreateSource(audio->GetBuffer());
     newSource->SetMode(ysAudioSource::Mode::PlayOnce);
     newSource->SetPan(0.0f);
     newSource->SetVolume(1.0f);
+#endif
 
     return YDS_ERROR_RETURN(ysError::None);
 }

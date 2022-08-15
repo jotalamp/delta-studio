@@ -41,6 +41,9 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
 
     if (API == DeviceAPI::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
+#if 1 // HACK
+    *newDevice = CreateApiDevice<DeviceAPI::OpenGL4_0>();
+#else
     switch(API) {
     case DeviceAPI::DirectX10:
         *newDevice = CreateApiDevice<DeviceAPI::DirectX10>();
@@ -55,6 +58,7 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
         *newDevice = CreateApiDevice<DeviceAPI::Vulkan>();
         break;
     }
+#endif
 
     if (*newDevice == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::NoPlatform);
 
