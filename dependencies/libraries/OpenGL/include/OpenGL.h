@@ -2,11 +2,19 @@
 #define OPENGL_H
 
 
+#ifdef __WIN32
+#include <GL/gl.h>
+#include <gl/wglext.h>
+#elif defined(__APPLE__)
+// Probably shouldn't do this
+#define GL_SILENCE_DEPRECATION
+
+#include <gl3.h>
+#include <gl3ext.h>
+
+#else
 #include <GL/gl.h>
 #include <GL/glext.h>
-
-#if !__linux__
-#include <gl/wglext.h>
 #endif
 
 #endif /* OPENGL_H */

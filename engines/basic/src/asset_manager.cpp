@@ -548,7 +548,7 @@ dbasic::TextureAsset *dbasic::AssetManager::GetTexture(const char *name) {
 ysError dbasic::AssetManager::LoadAudioFile(const char *fname, const char *name) {
     YDS_ERROR_DECLARE("LoadAudioFile");
 
-#ifdef _WIN32
+#ifdef __WIN32
     ysWindowsAudioWaveFile waveFile;
     waveFile.OpenFile(fname);
 

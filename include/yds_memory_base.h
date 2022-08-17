@@ -3,7 +3,12 @@
 
 #include "yds_base.h"
 
+#ifdef __WIN32
 #include <malloc.h>
+#else
+#include <stdlib.h>
+#endif
+
 #include <new>
 #include <stddef.h>
 #include <assert.h>

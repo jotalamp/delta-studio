@@ -253,7 +253,8 @@ ysError ysVulkanDevice::CreateAlphaTexture(ysTexture **texture, int width, int h
     *texture = nullptr;
 
     ysVulkanTexture *newTexture = m_textures.NewGeneric<ysVulkanTexture>();
-    strcpy_s(newTexture->m_filename, 257, "");
+
+    newTexture->m_filename[0] = '\0';
     newTexture->m_width = width;
     newTexture->m_height = height;
 

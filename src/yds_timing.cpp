@@ -1,38 +1,19 @@
 #include "../include/yds_timing.h"
 
-ysTimingSystem *ysTimingSystem::g_instance = nullptr;
-
-#ifdef _WIN32
+#ifdef __WIN32
 #include <windows.h>
 #include <mmsystem.h>
-
 #include <intrin.h>
-
-static bool qpcFlag;
-static LARGE_INTEGER qpcFrequency;
-
-uint64_t SystemTime() {
-    if (qpcFlag) {
-        LARGE_INTEGER currentTime;
-        QueryPerformanceCounter(&currentTime);
-
-        currentTime.QuadPart *= 1000000;
-        currentTime.QuadPart /= qpcFrequency.QuadPart;
-
-        return (uint64_t)(currentTime.QuadPart);
-    }
-    else {
-        // Convert output to microseconds
-        return (uint64_t)(timeGetTime() * 1000);
-    }
-}
-#else
-uint64_t SystemTime() {
-    // TODO
-    return 0;
-}
-#define __rdtsc() SystemTime()
 #endif
+
+#include <chrono>
+
+
+uint64_t SystemTime() {
+    auto now = std::chrono::steady_clock::now();
+    auto us = std::chrono::time_point_cast<std::chrono::microseconds>(now).time_since_epoch();
+    return us.count();
+}
 
 ysTimingSystem::ysTimingSystem() {
     SetPrecisionMode(Precision::Microsecond);
@@ -47,12 +28,14 @@ uint64_t ysTimingSystem::GetTime() {
     return SystemTime();
 }
 
-uint64_t SystemClock() {
-    return __rdtsc();
+inline uint64_t SystemClock() {
+    auto now = std::chrono::steady_clock::now();
+    auto us = std::chrono::time_point_cast<std::chrono::microseconds>(now).time_since_epoch();
+    return us.count();
 }
 
 uint64_t ysTimingSystem::GetClock() {
-    return SystemClock();
+    return (uint64_t) SystemClock();
 }
 
 void ysTimingSystem::SetPrecisionMode(Precision mode) {
@@ -78,10 +61,11 @@ void ysTimingSystem::Update() {
     uint64_t thisTime = GetTime();
     m_lastFrameDuration = (thisTime - m_lastFrameTimestamp);
     m_lastFrameTimestamp = thisTime;
-
+    /*
     uint64_t thisClock = GetClock();
     m_lastFrameClockTicks = (thisClock - m_lastFrameClockstamp);
     m_lastFrameClockstamp = thisClock;
+    */
 
     if (m_frameNumber > 1) {
         if (m_averageFrameDuration <= 0) {
@@ -97,10 +81,7 @@ void ysTimingSystem::Update() {
 }
 
 void ysTimingSystem::Initialize() {
-#if _WIN32
-    qpcFlag = (QueryPerformanceFrequency(&qpcFrequency) > 0);
-#endif
-
+    
     m_frameNumber = 0;
 
     m_lastFrameTimestamp = GetTime();

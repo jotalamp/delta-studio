@@ -20,9 +20,9 @@ public:
     virtual void SetState(WindowState state) override;
     virtual void SetTitle(std::string title) override;
 
-protected:
-
     SDL_Window *m_window;
+
+protected:
 
     WindowState m_appliedState = WindowState::Unknown;
 };
