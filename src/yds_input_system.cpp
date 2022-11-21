@@ -1,7 +1,12 @@
 #include "../include/yds_input_system.h"
 
 #include "../include/yds_window_system.h"
+#if PLATFORM_WIN32
 #include "../include/yds_windows_input_system.h"
+#endif
+#if PLATFORM_SDL
+#include "../include/yds_sdl_input_system.h"
+#endif
 
 ysInputSystem::ysInputSystem() : ysWindowSystemObject("INPUT_SYSTEM", Platform::Unknown) {
     m_windowSystem = nullptr;
@@ -21,13 +26,20 @@ ysError ysInputSystem::CreateInputSystem(ysInputSystem **newInputSystem, Platfor
     if (newInputSystem == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
     *newInputSystem = nullptr;
 
-    if (platform == Platform::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
-
     switch (platform) {
     case Platform::Windows:
+#if PLATFORM_WIN32
         *newInputSystem = new ysWindowsInputSystem();
+#endif
+        break;
+    case Platform::Sdl:
+#if PLATFORM_SDL
+        *newInputSystem = new ysSdlInputSystem();
+#endif
         break;
     }
+
+    if (*newInputSystem == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
 
     return YDS_ERROR_RETURN_STATIC(ysError::None);
 }
@@ -127,6 +139,9 @@ void ysInputSystem::RegisterDevice(ysInputDevice *device) {
     else if (device->GetType() == ysInputDevice::InputDeviceType::MOUSE) {
         m_mouseAggregator.RegisterMouse(device->GetAsMouse());
     }
+    else if (device->GetType() == ysInputDevice::InputDeviceType::JOYSTICK) {
+        m_joystickAggregator.RegisterJoystick(device->GetAsJoystick());
+    }
 }
 
 void ysInputSystem::UnregisterDevice(ysInputDevice *device) {
@@ -135,6 +150,10 @@ void ysInputSystem::UnregisterDevice(ysInputDevice *device) {
     }
     else if (device->GetType() == ysInputDevice::InputDeviceType::MOUSE) {
         m_mouseAggregator.DeleteMouse(device->GetAsMouse());
+    }
+    
+    else if (device->GetType() == ysInputDevice::InputDeviceType::JOYSTICK) {
+        m_joystickAggregator.DeleteJoystick(device->GetAsJoystick());
     }
 }
 

@@ -8,11 +8,9 @@ public:
         Right,
         Middle,
 
-        Aux_1,
-        Aux_2,
-        Aux_3,
-        Aux_4,
-        Aux_5,
+        Aux_00,
+        Aux_01,
+        Aux_02,
 
         Count
     };

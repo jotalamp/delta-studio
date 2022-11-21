@@ -257,6 +257,11 @@ protected:
 
     // Platform Dependant Constants
     int m_maxTextureSlots;
+
+protected:
+    // Each api implementation should implement this function
+    template<DeviceAPI api>
+    static ysDevice* CreateApiDevice();
 };
 
 #endif /* YDS_DEVICE_H */

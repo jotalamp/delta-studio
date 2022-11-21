@@ -6,6 +6,7 @@
 #include "yds_input_device.h"
 #include "yds_keyboard_aggregator.h"
 #include "yds_mouse_aggregator.h"
+#include "yds_joystick_aggregator.h"
 
 class ysWindowSystem;
 
@@ -45,6 +46,7 @@ public:
 
     ysKeyboardAggregator *GetKeyboardAggregator() { return &m_keyboardAggregator; }
     ysMouseAggregator *GetMouseAggregator() { return &m_mouseAggregator; }
+    ysJoystickAggregator *GetJoystickAggregator() { return &m_joystickAggregator; }
 
 protected:
     // Create and register input devices. This function must be called
@@ -69,6 +71,7 @@ protected:
 protected:
     ysKeyboardAggregator m_keyboardAggregator;
     ysMouseAggregator m_mouseAggregator;
+    ysJoystickAggregator m_joystickAggregator;
 
     // Input device array
     ysDynamicArray<ysInputDevice, 4> m_inputDeviceArray;

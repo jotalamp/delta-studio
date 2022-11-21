@@ -5,6 +5,9 @@
 
 #include "yds_keyboard.h"
 #include "yds_mouse.h"
+#include "yds_joystick.h"
+
+#include <string>
 
 class ysInputSystem;
 
@@ -12,11 +15,10 @@ class ysInputDevice : public ysWindowSystemObject {
     friend ysInputSystem;
 
 public:
-    static const int MAX_NAME_LENGTH = 256;
-
     enum class InputDeviceType {
         KEYBOARD,
         MOUSE,
+        JOYSTICK,
         CUSTOM,
         UNKNOWN
     };
@@ -28,8 +30,8 @@ public:
 
     InputDeviceType GetType() const { return m_type; }
 
-    void SetName(const char *name);
-    const char *GetName() const { return m_name; }
+    void SetName(std::string name);
+    std::string GetName() const { return m_name; }
 
     void SetType(InputDeviceType type);
 
@@ -42,6 +44,7 @@ public:
 
     ysKeyboard *GetAsKeyboard();
     ysMouse *GetAsMouse();
+    ysJoystick *GetAsJoystick();
 
     bool IsConnected() const { return m_connected; }
     void SetConnected(bool connected) { m_connected = connected; }
@@ -53,7 +56,7 @@ private:
     void Destroy();
 
     InputDeviceType m_type;
-    char m_name[MAX_NAME_LENGTH];
+    std::string m_name;
 
     int m_deviceID;
     int m_dependencyCount;
@@ -62,6 +65,7 @@ private:
     union {
         ysKeyboard *m_keyboard;
         ysMouse *m_mouse;
+        ysJoystick *m_joystick;
 
         void *m_genericData;
     };

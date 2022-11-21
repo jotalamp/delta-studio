@@ -107,6 +107,13 @@ namespace dbasic {
         bool ProcessMouseButtonDown(ysMouse::Button button);
         bool ProcessMouseButtonUp(ysMouse::Button button);
         bool IsMouseButtonDown(ysMouse::Button button);
+
+        bool ProcessJoystickButtonDown(ysJoystick::Button button);
+        bool ProcessJoystickButtonUp(ysJoystick::Button button);
+        bool IsJoystickButtonDown(ysJoystick::Button button);
+        void GetJoystickAxes(int *x, int *y, int *z);
+        //void GetJoystickAxeZ(int *z);
+
         int GetMouseWheel();
         void GetMousePos(int *x, int *y);
         void GetOsMousePos(int *x, int *y);
@@ -171,6 +178,7 @@ namespace dbasic {
 
         ysKeyboard *m_mainKeyboard;
         ysMouse *m_mainMouse;
+        ysJoystick *m_mainJoystick;
 
         // Shader Controls
         ShaderSet *m_shaderSet;
@@ -218,9 +226,6 @@ namespace dbasic {
         // Cursor
         bool m_cursorPositionLocked;
         bool m_cursorHidden;
-
-        // Input
-        bool m_globalInputCapture;
 
     protected:
         // Initialization Routines

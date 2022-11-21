@@ -1,9 +1,5 @@
 #include "../include/yds_device.h"
 
-#include "../include/yds_vulkan_device.h"
-#include "../include/yds_opengl_device.h"
-#include "../include/yds_d3d11_device.h"
-#include "../include/yds_d3d10_device.h"
 
 ysDevice::ysDevice() : ysContextObject("API_DEVICE", DeviceAPI::Unknown) {
     for (int i = 0; i < MaxRenderTargets; ++i) m_activeRenderTarget[i] = nullptr;
@@ -47,18 +43,28 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
 
     switch(API) {
     case DeviceAPI::DirectX10:
-        *newDevice = new ysD3D10Device;
+#if PLATFORM_WIN32
+        *newDevice = CreateApiDevice<DeviceAPI::DirectX10>();
+#endif
         break;
     case DeviceAPI::DirectX11:
-        *newDevice = new ysD3D11Device;
+#if PLATFORM_WIN32
+        *newDevice = CreateApiDevice<DeviceAPI::DirectX11>();
+#endif
         break;
     case DeviceAPI::OpenGL4_0:
-        *newDevice = new ysOpenGLDevice;
+#if PLATFORM_SDL
+        *newDevice = CreateApiDevice<DeviceAPI::OpenGL4_0>();
+#endif
         break;
     case DeviceAPI::Vulkan:
-        *newDevice = new ysVulkanDevice;
+#if PLATFORM_WIN32
+        *newDevice = CreateApiDevice<DeviceAPI::Vulkan>();
+#endif
         break;
     }
+
+    if (*newDevice == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::NoPlatform);
 
     return YDS_ERROR_RETURN_STATIC(ysError::None);
 }
@@ -294,7 +300,7 @@ ysError ysDevice::DestroyGPUBuffer(ysGPUBuffer *&buffer) {
     YDS_NESTED_ERROR_CALL( m_gpuBuffers.Delete(buffer->GetIndex()) );
     buffer = nullptr;
 
-    return YDS_ERROR_RETURN(ysError::None); 
+    return YDS_ERROR_RETURN(ysError::None);
 }
 
 ysError ysDevice::DestroyShader(ysShader *&shader) {
