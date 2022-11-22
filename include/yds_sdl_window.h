@@ -16,13 +16,13 @@ public:
     ~ysSdlWindow();
 
     // Overrides
-    virtual ysError InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor, ysContextObject::DeviceAPI api) override;
+    virtual ysError InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor) override;
     virtual void SetState(WindowState state) override;
     virtual void SetTitle(std::string title) override;
-    virtual bool SetWindowStyle(WindowStyle style) override;
 
 protected:
-    SDL_Window *m_window = nullptr;
-    int m_old_width = 0;
-    int m_old_height = 0;
+
+    SDL_Window *m_window;
+
+    WindowState m_appliedState = WindowState::Unknown;
 };

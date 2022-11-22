@@ -10,12 +10,10 @@
 
 ysInputSystem::ysInputSystem() : ysWindowSystemObject("INPUT_SYSTEM", Platform::Unknown) {
     m_windowSystem = nullptr;
-    m_enableGlobalInput = false;
 }
 
 ysInputSystem::ysInputSystem(Platform platform) : ysWindowSystemObject("INPUT_SYSTEM", platform) {
     m_windowSystem = nullptr;
-    m_enableGlobalInput = false;
 }
 
 ysInputSystem::~ysInputSystem() {
@@ -141,6 +139,9 @@ void ysInputSystem::RegisterDevice(ysInputDevice *device) {
     else if (device->GetType() == ysInputDevice::InputDeviceType::MOUSE) {
         m_mouseAggregator.RegisterMouse(device->GetAsMouse());
     }
+    else if (device->GetType() == ysInputDevice::InputDeviceType::JOYSTICK) {
+        m_joystickAggregator.RegisterJoystick(device->GetAsJoystick());
+    }
 }
 
 void ysInputSystem::UnregisterDevice(ysInputDevice *device) {
@@ -149,6 +150,10 @@ void ysInputSystem::UnregisterDevice(ysInputDevice *device) {
     }
     else if (device->GetType() == ysInputDevice::InputDeviceType::MOUSE) {
         m_mouseAggregator.DeleteMouse(device->GetAsMouse());
+    }
+    
+    else if (device->GetType() == ysInputDevice::InputDeviceType::JOYSTICK) {
+        m_joystickAggregator.DeleteJoystick(device->GetAsJoystick());
     }
 }
 

@@ -10,7 +10,6 @@
 #include "yds_input_layout.h"
 #include "yds_shader_program.h"
 #include "yds_texture.h"
-#include "yds_subclass_registry.h"
 
 struct ysTextureSlot {
     ysRenderTarget *RenderTarget;
@@ -259,11 +258,10 @@ protected:
     // Platform Dependant Constants
     int m_maxTextureSlots;
 
-private:
-    using Registry = ysSubclassRegistry<DeviceAPI, ysDevice>;
-    static Registry s_registry;
-
-    template<typename Subclass, typename... Args> friend struct ysRegisterSubclass;
+protected:
+    // Each api implementation should implement this function
+    template<DeviceAPI api>
+    static ysDevice* CreateApiDevice();
 };
 
 #endif /* YDS_DEVICE_H */

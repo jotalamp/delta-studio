@@ -43,6 +43,8 @@ ysError dbasic::DefaultShaders::Initialize(ShaderSet *shaderSet, ysRenderTarget 
 
     m_mainStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
 
+    m_cameraMode = CameraMode::Target;
+
     return YDS_ERROR_RETURN(ysError::None);
 }
 

@@ -59,12 +59,12 @@ float pow5(float v) {
 float f_diffuse(vec3 i, vec3 o, vec3 h, vec3 normal, float power, float roughness) {
 	float h_dot_i = dot(h, i);
 	float h_dot_i_2 = h_dot_i * h_dot_i;
-	float f_d90 = 0.5 + 2 * h_dot_i_2 * roughness;
+	float f_d90 = 0.5 + 2.0 * h_dot_i_2 * roughness;
 
 	float cos_theta_i = dot(i, normal);
 	float cos_theta_o = dot(o, normal);
 
-	float f_d = (1 + (f_d90 - 1) * pow5(1 - cos_theta_i)) * (1 + (f_d90 - 1) * pow5(1 - cos_theta_o));
+	float f_d = (1.0 + (f_d90 - 1.0) * pow5(1.0 - cos_theta_i)) * (1.0 + (f_d90 - 1.0) * pow5(1.0 - cos_theta_o));
 	return clamp(f_d * power * cos_theta_i, 0.0, 1.0);
 }
 
@@ -72,13 +72,13 @@ float f_specular(vec3 i, vec3 o, vec3 h, vec3 normal, float F0, float power, flo
 	vec3 reflected = -reflect(i, normal);
 	float intensity = dot(reflected, o);
 
-	if (intensity < 0) return 0;
+	if (intensity < 0.0) return 0.0;
 
 	// Fresnel approximation
 	float F0_scaled = 0.08 * F0;
 	float o_dot_h = dot(o, h);
-	float s = pow5(1 - o_dot_h);
-	float F = F0_scaled + s * (1 - F0_scaled);
+	float s = pow5(1.0 - o_dot_h);
+	float F = F0_scaled + s * (1.0 - F0_scaled);
 
 	return clamp(pow(intensity, specularPower) * F * power, 0.0, 1.0);
 }
@@ -87,8 +87,8 @@ float f_specular_ambient(vec3 o, vec3 normal, float F0, float power) {
 	// Fresnel approximation
 	float F0_scaled = 0.08 * F0;
 	float o_dot_n = dot(o, normal);
-	float s = pow5(1 - o_dot_n);
-	float F = F0_scaled + s * (1 - F0_scaled);
+	float s = pow5(1.0 - o_dot_n);
+	float F = F0_scaled + s * (1.0 - F0_scaled);
 
 	return clamp(F * power, 0.0, 1.0);
 }
@@ -100,7 +100,7 @@ float linearToSrgb(float u) {
 		return 12.92 * u;
 	}
 	else {
-		return 1.055 * pow(u, 1 / 2.4) - 0.055;
+		return 1.055 * pow(u, 1.0 / 2.4) - 0.055;
 	}
 }
 
@@ -132,109 +132,45 @@ vec3 srgbToLinear(vec3 v) {
 }
 
 void main(void) {
-	const float FullSpecular = 1 / 0.08;
+	const float FullSpecular = 1.0 / 0.08;
 
-	vec3 totalLighting = vec3(1.0, 1.0, 1.0);
+	vec3 totalLighting = vec3(0.6, 0.6, 1.0);
 	vec3 normal = normalize(ex_Normal.xyz);
 
 	vec4 baseColor;
 	float roughness = 0.5;
-	float power = 10.0;
+	float power = 1.0;
 
 	vec4 newColor;
 
-	vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
-	float cos_theta_o = dot(o, normal);
-
-	vec4 AmbientLighting2 = AmbientLighting;
-
-	AmbientLighting2 = vec4(0.6);
-
-	vec4 diffuse = texture(diffuseTex, ex_Tex).rgba;
-
-	/*
 	if (ColorReplace == 0) {
-		
+		vec4 diffuse = texture(diffuseTex, ex_Tex).rgba;
 		baseColor = vec4(srgbToLinear(diffuse.rgb), diffuse.a) * BaseColor;
-
-		//newColor = baseColor * vec4(normal,1.0);
-		//newColor.a = 1.0;
-		newColor = diffuse;
+		newColor = BaseColor;
+		vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
+		float cos_theta_o = dot(o, normal);
+		newColor = cos_theta_o * cos_theta_o * BaseColor;
+		//newColor.a = 0.1;
+		//newColor = 0.5*BaseColor;
 	}
-	else*/ 
-	{
+	else {
+		vec4 diffuse = texture(diffuseTex, ex_Tex).rgba;
 		baseColor = BaseColor;
-
-		//newColor = baseColor;
-
-		if(Lit == 1) {
-			//vec3 lightPos = vec3(0.0, -5.0, 50.0);
-			vec3 lightPos = vec3(0.0, -100.0, 0.0);
-			
-			//vec3 L = normalize(lightPos - ex_Pos.xyz);
-			vec3 L = normalize(lightPos);
-			
-			float a = dot(L, normal);
-			
-			float lambertian = max(dot(normal, L), 0.0);
-			
-			float specular = 0.0;
-			
-			float shininessVal = 3.0;
-			
-
-			//if(lambertian > 0.0) 
-			{
-				
-				vec3 R = reflect(-L, normal);      // Reflected light vector
-				
-				vec3 V = normalize(-ex_Pos.xyz); // Vector to viewer
-				
-				// Compute the specular term
-				float specAngle = max(dot(R, V), 0.0);
-				
-				specular = pow(specAngle, shininessVal);
-				
-  			}
-
-			vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
-			float cos_theta_o = dot(o, normal);
-			//newColor = baseColor * ( 0.4 + cos_theta_o * cos_theta_o );
-			//newColor = 0.5 * baseColor + 0.5 * cos_theta_o;
-
-
-			vec3 ambientSpecular = f_specular_ambient(o, normal, 2.0, 0.5) * AmbientLighting2.rgb;
-			
-			vec3 ambientDiffuse = f_diffuse(o, o, o, normal, 0.5, 0.5) * AmbientLighting2.rgb * baseColor.rgb;
-			//vec3 ambientSpecular = f_specular_ambient(o, normal, IncidentSpecular, SpecularMix) * AmbientLighting2.rgb;
-
-			vec3 ambientMetallic = f_specular_ambient(o, normal, 0.5, 99.0) * AmbientLighting2.rgb * baseColor.rgb;
-			newColor.rgb = 0.7 * specular * baseColor.rgb + 3.0 * ambientDiffuse;
-			newColor.a = 1.0f;
-
-			if (ColorReplace == 0)
-				newColor = 4.0f * newColor * vec4(srgbToLinear(diffuse.rgb), diffuse.a);
-		}
-		else
-			newColor = baseColor;
-			newColor.a = 1.0f;
-			//newColor = newColor * vec4(srgbToLinear(diffuse.rgb), diffuse.a);
+		vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
+		float cos_theta_o = dot(o, normal);
+		newColor = BaseColor;
+		//newColor = 0.5 *BaseColor;
 	}
 
 	totalLighting = baseColor.rgb;
 
-	
-
-	
-
 	if (Lit == 1) {
-		//vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
 		vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
 		float cos_theta_o = dot(o, normal);
 
-		vec3 ambientSpecular = f_specular_ambient(o, normal, IncidentSpecular, SpecularMix) * AmbientLighting2.rgb;
-		vec3 ambientDiffuse = f_diffuse(o, o, o, normal, DiffuseMix, DiffuseRoughness) * AmbientLighting2.rgb * baseColor.rgb;
-		vec3 ambientMetallic = f_specular_ambient(o, normal, FullSpecular, 1.0) * AmbientLighting2.rgb * baseColor.rgb;
+		vec3 ambientSpecular = f_specular_ambient(o, normal, IncidentSpecular, SpecularMix) * AmbientLighting.rgb;
+		vec3 ambientDiffuse = f_diffuse(o, o, o, normal, DiffuseMix, DiffuseRoughness) * AmbientLighting.rgb * baseColor.rgb;
+		vec3 ambientMetallic = f_specular_ambient(o, normal, FullSpecular, 1.0) * AmbientLighting.rgb * baseColor.rgb;
 
 		totalLighting = mix(
 			ambientSpecular + ambientDiffuse,
@@ -251,16 +187,16 @@ void main(void) {
 
 			float cos_theta_i = dot(i, normal);
 
-			if (cos_theta_i < 0) continue;
-			if (cos_theta_o < 0) continue;
+			if (cos_theta_i < 0.0) continue;
+			if (cos_theta_o < 0.0) continue;
 
 			vec3 h = normalize(i + o);
 			vec3 diffuse = f_diffuse(i, o, h, normal, DiffuseMix, DiffuseRoughness) * baseColor.rgb * Lights[li].Color.rgb;
 			vec3 specular = f_specular(i, o, h, normal, IncidentSpecular, SpecularMix, SpecularPower) * Lights[li].Color.rgb;
 			vec3 metallic = vec3(0.0, 0.0, 0.0);
 
-			if (Metallic > 0) {
-				metallic = f_specular(i, o, h, normal, FullSpecular, 1, SpecularPower) * Lights[li].Color.rgb * baseColor.rgb;
+			if (Metallic > 0.0) {
+				metallic = f_specular(i, o, h, normal, FullSpecular, 1.0, SpecularPower) * Lights[li].Color.rgb * baseColor.rgb;
 			}
 
 			// Spotlight calculation
@@ -270,7 +206,7 @@ void main(void) {
 			else if (spotCoherence < Lights[li].Attenuation1) spotAttenuation = 0.0;
 			else {
 				float t = Lights[li].Attenuation0 - Lights[li].Attenuation1;
-				if (t == 0) spotAttenuation = 1.0;
+				if (t == 0.0) spotAttenuation = 1.0;
 				else spotAttenuation = (spotCoherence - Lights[li].Attenuation1) / t;
 			}
 
@@ -288,10 +224,9 @@ void main(void) {
 		}
 	}
 
-	const float distanceToCamera = length(CameraEye.xyz - ex_Pos.xyz);
-	const float fogAttenuation = (clamp(distanceToCamera, FogNear, FogFar) - FogNear) / (FogFar - FogNear);
+	float distanceToCamera = length(CameraEye.xyz - ex_Pos.xyz);
+	float fogAttenuation = (clamp(distanceToCamera, FogNear, FogFar) - FogNear) / (FogFar - FogNear);
 
-	newColor.a = DiffuseMix;
 	out_Color = newColor;
 /*
 	out_Color = vec4(

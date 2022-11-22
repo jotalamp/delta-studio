@@ -23,7 +23,9 @@ namespace ysGeometryPreprocessing {
     void SeparateBySmoothingGroups(ysObjectData *object);
 
     void CalculateNormals(ysObjectData *object);
+    ysVector *CalculateHardNormals(ysObjectData *object);
 
+    ysVector *CalculateHardTangents(ysObjectData *object, int mapChannel);
     void CalculateTangents(ysObjectData *object, int mapChannel);
 
     void SpreadSmoothingGroup(ysObjectData *object, int face, int group, ysVector *tempNormals, int *count);

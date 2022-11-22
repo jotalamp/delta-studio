@@ -21,6 +21,7 @@ protected:
 private:
     ysKeyboard *GetKeyboard();
     ysMouse *GetMouse();
+    ysJoystick *GetJoystick();
 };
 
 #endif /* YDS_SDL_INPUT_SYSTEM_H */

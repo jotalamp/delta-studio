@@ -39,6 +39,9 @@ void ysInputDevice::Destroy() {
     else if (m_type == InputDeviceType::MOUSE) {
         delete m_mouse;
     }
+    else if (m_type == InputDeviceType::JOYSTICK) {
+        delete m_joystick;
+    }
     else if (m_type == InputDeviceType::CUSTOM) {
         // Delete custom
     }
@@ -61,6 +64,9 @@ void ysInputDevice::SetType(ysInputDevice::InputDeviceType type) {
     else if (m_type == InputDeviceType::MOUSE) {
         m_mouse = new ysMouse;
     }
+    else if (m_type == InputDeviceType::JOYSTICK) {
+        m_joystick= new ysJoystick;
+    }
     else if (m_type == InputDeviceType::CUSTOM) {
         // New custom
     }
@@ -77,5 +83,12 @@ ysMouse *ysInputDevice::GetAsMouse() {
     if (m_type == InputDeviceType::MOUSE) return m_mouse;
 
     //RaiseError(false, "Illegal access of mouse.\n");
+    return nullptr;
+}
+
+ysJoystick *ysInputDevice::GetAsJoystick() {
+    if (m_type == InputDeviceType::JOYSTICK) return m_joystick;
+
+    //RaiseError(false, "Illegal access of joystick.\n");
     return nullptr;
 }

@@ -3,7 +3,6 @@
 
 #include "yds_window_system_object.h"
 #include "yds_monitor.h"
-#include "yds_context_object.h"
 
 #include <string>
 
@@ -18,6 +17,7 @@ public:
         Maximized,
         Minimized,
         Closed,
+        Fullscreen,
         Unknown
     };
 
@@ -34,8 +34,8 @@ public:
     virtual ~ysWindow();
 
     /* Interface */
-    virtual ysError InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor, ysContextObject::DeviceAPI api);
-    virtual ysError InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, ysMonitor *monitor, ysContextObject::DeviceAPI api);
+    virtual ysError InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor);
+    virtual ysError InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, ysMonitor *monitor);
 
     virtual void Close() { SetState(WindowState::Closed); }
     virtual void SetState(WindowState state = WindowState::Visible) { m_windowState = state; }
@@ -135,8 +135,6 @@ protected:
 
     float m_gameResolutionScaleHorizontal;
     float m_gameResolutionScaleVertical;
-
-    ysContextObject::DeviceAPI m_api;
 
 protected:
     // Event handler

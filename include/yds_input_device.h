@@ -5,6 +5,7 @@
 
 #include "yds_keyboard.h"
 #include "yds_mouse.h"
+#include "yds_joystick.h"
 
 #include <string>
 
@@ -17,6 +18,7 @@ public:
     enum class InputDeviceType {
         KEYBOARD,
         MOUSE,
+        JOYSTICK,
         CUSTOM,
         UNKNOWN
     };
@@ -42,6 +44,7 @@ public:
 
     ysKeyboard *GetAsKeyboard();
     ysMouse *GetAsMouse();
+    ysJoystick *GetAsJoystick();
 
     bool IsConnected() const { return m_connected; }
     void SetConnected(bool connected) { m_connected = connected; }
@@ -62,6 +65,7 @@ private:
     union {
         ysKeyboard *m_keyboard;
         ysMouse *m_mouse;
+        ysJoystick *m_joystick;
 
         void *m_genericData;
     };

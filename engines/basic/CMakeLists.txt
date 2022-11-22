@@ -28,6 +28,7 @@ add_library(delta-basic STATIC
     include/pose.h
     include/render_node.h
     include/render_skeleton.h
+    include/safe_string.h
     include/scene_object_asset.h
     include/shader_base.h
     include/shader_controls.h
@@ -65,6 +66,7 @@ add_library(delta-basic STATIC
     src/pose.cpp
     src/render_node.cpp
     src/render_skeleton.cpp
+    src/safe_string.cpp
     src/scene_object_asset.cpp
     src/shader_base.cpp
     src/shader_set.cpp
@@ -76,24 +78,7 @@ add_library(delta-basic STATIC
     src/window_handler.cpp
 )
 
-# Link in the whole archive since we depend on parts that aren't directly referenced by us
-if (WIN32)
-    set(LINK_WHOLE_ARCHIVE_START "")
-    set(LINK_WHOLE_ARCHIVE_END "")
-else()
-    set(LINK_WHOLE_ARCHIVE_START -Wl,--push-state,--whole-archive)
-    set(LINK_WHOLE_ARCHIVE_END -Wl,--pop-state)
-endif()
-
 target_link_libraries(delta-basic PUBLIC
-    ${LINK_WHOLE_ARCHIVE_START}
     delta-core
     delta-physics
-    ${LINK_WHOLE_ARCHIVE_END}
 )
-
-if (WIN32)
-    target_link_options(delta-basic PUBLIC
-        /WHOLEARCHIVE:delta-core
-    )
-endif()

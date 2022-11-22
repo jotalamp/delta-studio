@@ -30,8 +30,7 @@ void delta_demo::EmptyWindowDemo::Initialize(void *instance, ysContextObject::De
         nullptr,
         "01-Empty Window Demo",
         ysWindow::WindowStyle::Windowed,
-        mainMonitor,
-        api);
+        mainMonitor);
     if (result != ysError::None) return;
 
     result = ysDevice::CreateDevice(&m_device, api);

@@ -8,7 +8,7 @@ ysSdlAudioDevice::ysSdlAudioDevice() : ysAudioDevice(API::Sdl) {
 }
 
 ysSdlAudioDevice::~ysSdlAudioDevice() {
-    SDL_CloseAudioDevice(m_deviceId);
+    /* void */
 }
 
 ysAudioBuffer *ysSdlAudioDevice::CreateBuffer(const ysAudioParameters *parameters, SampleOffset size) {

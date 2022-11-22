@@ -17,7 +17,12 @@
 #include <SDL_image.h>
 
 #include "../include/yds_file.h"
-#include "../include/yds_safe_string.h"
+#include "../engines/basic/include/safe_string.h" // TODO: move this down into delta
+
+template<>
+ysDevice* ysDevice::CreateApiDevice<ysContextObject::DeviceAPI::OpenGL4_0>() {
+    return new ysOpenGLDevice();
+}
 
 ysOpenGLDevice::ysOpenGLDevice() : ysDevice(ysContextObject::DeviceAPI::OpenGL4_0) {
     m_deviceCreated = false;
@@ -702,8 +707,8 @@ ysError ysOpenGLDevice::CreateVertexShader(ysShader **newShader, const char *sha
     }
 
     ysOpenGLShader *newOpenGLShader = m_shaders.NewGeneric<ysOpenGLShader>();
-    strcpy_s(newOpenGLShader->m_shaderName, shaderName);
-    strcpy_s(newOpenGLShader->m_filename, shaderFilename);
+    strcpy_s(newOpenGLShader->m_shaderName, 64, shaderName);
+    strcpy_s(newOpenGLShader->m_filename, 256, shaderFilename);
     newOpenGLShader->m_shaderType = ysShader::ShaderType::Vertex;
     newOpenGLShader->m_handle = handle;
 
@@ -755,8 +760,8 @@ ysError ysOpenGLDevice::CreatePixelShader(ysShader **newShader, const char *shad
     }
 
     ysOpenGLShader *newOpenGLShader = m_shaders.NewGeneric<ysOpenGLShader>();
-    strcpy_s(newOpenGLShader->m_shaderName, shaderName);
-    strcpy_s(newOpenGLShader->m_filename, shaderFilename);
+    strcpy_s(newOpenGLShader->m_shaderName, 64, shaderName);
+    strcpy_s(newOpenGLShader->m_filename, 256, shaderFilename);
     newOpenGLShader->m_shaderType = ysShader::ShaderType::Pixel;
     newOpenGLShader->m_handle = shaderHandle;
 
@@ -960,7 +965,7 @@ ysError ysOpenGLDevice::CreateTexture(ysTexture **texture, const char *fname) {
     }
 
     ysOpenGLTexture *newTexture = m_textures.NewGeneric<ysOpenGLTexture>();
-    strcpy_s(newTexture->m_filename, fname);
+    strcpy_s(newTexture->m_filename, 257, fname);
 
     glGenTextures(1, &newTexture->m_handle);
     glBindTexture(GL_TEXTURE_2D, newTexture->m_handle);
@@ -1028,7 +1033,7 @@ ysError ysOpenGLDevice::CreateTexture(ysTexture **texture, int width, int height
     *texture = nullptr;
 
     ysOpenGLTexture *newTexture = m_textures.NewGeneric<ysOpenGLTexture>();
-    strcpy_s(newTexture->m_filename, "");
+    strcpy_s(newTexture->m_filename, 257, "");
 
     glGenTextures(1, &newTexture->m_handle);
     glBindTexture(GL_TEXTURE_2D, newTexture->m_handle);
@@ -1058,7 +1063,7 @@ ysError ysOpenGLDevice::CreateAlphaTexture(ysTexture **texture, int width, int h
     *texture = nullptr;
 
     ysOpenGLTexture *newTexture = m_textures.NewGeneric<ysOpenGLTexture>();
-    strcpy_s(newTexture->m_filename, "");
+    strcpy_s(newTexture->m_filename, 257, "");
 
     glGenTextures(1, &newTexture->m_handle);
     glBindTexture(GL_TEXTURE_2D, newTexture->m_handle);
@@ -1316,6 +1321,3 @@ ysError ysOpenGLDevice::DestroyOpenGLRenderTarget(ysRenderTarget *target) {
 
     return YDS_ERROR_RETURN(ysError::None);
 }
-
-// ctor magic to register as a subclass
-static ysRegisterSubclass<ysOpenGLDevice> reg;

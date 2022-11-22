@@ -393,6 +393,3 @@ ysError ysVulkanDevice::CreateVulkanDevice(VkSurfaceKHR surface) {
 
     return YDS_ERROR_RETURN(ysError::None);
 }
-
-// ctor magic to register as a subclass
-static ysRegisterSubclass<ysVulkanDevice> reg;

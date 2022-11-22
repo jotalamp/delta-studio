@@ -149,12 +149,7 @@ LRESULT WINAPI ysWindowsWindowSystem::WinProc(HWND hWnd, UINT msg, WPARAM wParam
             target->OnKeyDown(wParam);
             return 0;
         case WM_INPUT:
-            if (inputSystem != nullptr) {
-                if (inputSystem->IsGlobalInputEnabled() || target->IsActive()) {
-                    return inputSystem->ProcessInputMessage((HRAWINPUT)lParam);
-                }
-                else return 0;
-            }
+            if (inputSystem != nullptr) return inputSystem->ProcessInputMessage((HRAWINPUT)lParam);
             else return 0;
         }
     }

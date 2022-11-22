@@ -33,6 +33,43 @@ else()
     set(TARGET_ARCHITECTURE x86)
 endif()
 
+# =========================================================
+# D3DX
+
+set(
+    D3DX_LIBS
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/D3DX/lib/${TARGET_ARCHITECTURE})
+set(
+    DXGI_LIBS
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/DXGI/lib/${TARGET_ARCHITECTURE})
+include_directories(dependencies/libraries/D3DX/include)
+
+# =========================================================
+# DirectSound
+
+set(
+    DIRECT_SOUND_LIBS
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/DirectSound/lib/${TARGET_ARCHITECTURE})
+
+# =========================================================
+# OpenGL
+
+include_directories(dependencies/libraries/OpenGL/include)
+
+# =========================================================
+# Vulkan
+
+set(
+    VULKAN_LIBS
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/vulkan/lib/${TARGET_ARCHITECTURE})
+include_directories(dependencies/libraries/vulkan/include)
+
+# =========================================================
+# SDL2
+
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 # =========================================================
 # Filesystem (stdlib or Boost)
@@ -93,6 +130,8 @@ add_library(delta-core STATIC
     src/yds_interchange_file_0_0.cpp
     src/yds_interchange_file_0_1.cpp
     src/yds_interchange_object.cpp
+    src/yds_joystick.cpp
+    src/yds_joystick_aggregator.cpp
     src/yds_keyboard.cpp
     src/yds_keyboard_aggregator.cpp
     src/yds_linked_list.cpp
@@ -109,7 +148,6 @@ add_library(delta-core STATIC
     src/yds_render_geometry_channel.cpp
     src/yds_render_geometry_format.cpp
     src/yds_render_target.cpp
-    src/yds_safe_string.cpp
     src/yds_shader.cpp
     src/yds_shader_program.cpp
     src/yds_stat.cpp
@@ -172,6 +210,8 @@ add_library(delta-core STATIC
     include/yds_interchange_file_0_0.h
     include/yds_interchange_file_0_1.h
     include/yds_interchange_object.h
+    include/yds_joystick.h
+    include/yds_joystick_aggregator.h
     include/yds_keyboard.h
     include/yds_keyboard_aggregator.h
     include/yds_key_maps.h
@@ -191,11 +231,9 @@ add_library(delta-core STATIC
     include/yds_render_geometry_channel.h
     include/yds_render_geometry_format.h
     include/yds_render_target.h
-    include/yds_safe_string.h
     include/yds_shader.h
     include/yds_shader_program.h
     include/yds_stat.h
-    include/yds_subclass_registry.h
     include/yds_texture.h
     include/yds_time_tag_data.h
     include/yds_timing.h
@@ -212,9 +250,6 @@ add_library(delta-core STATIC
 if (NOT USE_CXX17_FILESYSTEM)
     target_link_libraries(delta-core PUBLIC Boost::filesystem)
 endif()
-
-# SSE2NEON
-target_include_directories(delta-core PUBLIC dependencies/libraries/sse2neon-1.5.1)
 
 if(ENABLE_D3D)
     target_sources(delta-core PRIVATE
@@ -257,14 +292,6 @@ if(ENABLE_D3D)
         include/yds_d3d11_utilities.h
     )
 
-    set(
-        D3DX_LIBS
-        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/D3DX/lib/${TARGET_ARCHITECTURE})
-    set(
-        DXGI_LIBS
-        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/DXGI/lib/${TARGET_ARCHITECTURE})
-    target_include_directories(delta-core PUBLIC dependencies/libraries/D3DX/include)
-
     target_link_libraries(delta-core PRIVATE
         # D3DX
         d3d9
@@ -282,10 +309,7 @@ if(ENABLE_D3D)
         ${DXGI_LIBS}/DxErr.lib
         ${DXGI_LIBS}/dxgi.lib
         ${DXGI_LIBS}/dxguid.lib
-    )
 
-    target_compile_definitions(delta-core PRIVATE
-        -DAPI_D3D
     )
 endif()
 
@@ -304,22 +328,14 @@ if (ENABLE_DSOUND)
         include/yds_ds8_system.h
     )
 
-    set(DIRECT_SOUND_LIBS
-    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/DirectSound/lib/${TARGET_ARCHITECTURE})
-
     target_link_libraries(delta-core PRIVATE
         # DirectSound
         ${DIRECT_SOUND_LIBS}/dsound.lib
     )
 
-    target_compile_definitions(delta-core PRIVATE
-        -DSOUND_DSOUND
-    )
-
 endif()
 
 if(ENABLE_OPENGL)
-    set(OpenGL_GL_PREFERENCE GLVND)
     find_package(OpenGL REQUIRED)
     message("Found OpenGL include dir: ${OPENGL_INCLUDE_DIR}")
 
@@ -333,6 +349,9 @@ if(ENABLE_OPENGL)
         src/yds_opengl_shader.cpp
         src/yds_opengl_shader_program.cpp
         src/yds_opengl_texture.cpp
+        # TODO: make windows impl optional
+        #src/yds_opengl_windows_context.cpp
+        src/yds_opengl_sdl_context.cpp
 
         # Include files
         include/yds_opengl_context.h
@@ -343,13 +362,13 @@ if(ENABLE_OPENGL)
         include/yds_opengl_shader.h
         include/yds_opengl_shader_program.h
         include/yds_opengl_texture.h
+        include/yds_opengl_windows_context.h
+        include/yds_opengl_sdl_context.h
     )
 
     target_link_libraries(delta-core PRIVATE
         OpenGL::GL
     )
-
-    target_include_directories(delta-core PRIVATE dependencies/libraries/OpenGL/include)
 
     if (APPLE)
         target_include_directories(delta-code PRIVATE
@@ -385,12 +404,7 @@ if (ENABLE_VULKAN)
         include/yds_vulkan_windows_context.h
     )
 
-    target_include_directories(delta-core PRIVATE dependencies/libraries/vulkan/include)
-
     if (WIN32)
-        set(VULKAN_LIBS
-        ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libraries/vulkan/lib/${TARGET_ARCHITECTURE})
-
         target_link_libraries(delta-core PRIVATE
             ${VULKAN_LIBS}/vulkan-1.lib
         )
@@ -417,13 +431,6 @@ if (ENABLE_PLAT_WIN32)
         include/yds_windows_window.h
         include/yds_windows_window_system.h
     )
-
-    if (ENABLE_OPENGL)
-        target_sources(delta-core PRIVATE
-            src/yds_opengl_windows_context.cpp
-            include/yds_opengl_windows_context.h
-        )
-    endif()
 
     target_link_libraries(delta-core PRIVATE
         winmm
@@ -455,13 +462,6 @@ if (ENABLE_PLAT_SDL)
         include/yds_sdl_window.h
         include/yds_sdl_window_system.h
     )
-
-    if (ENABLE_OPENGL)
-        target_sources(delta-core PRIVATE
-            src/yds_opengl_sdl_context.cpp
-            include/yds_opengl_sdl_context.h
-        )
-    endif()
 endif()
 
 if (ENABLE_SDL)
@@ -474,7 +474,7 @@ if (ENABLE_SDL)
     )
 
     target_link_libraries(delta-core PRIVATE
-        ${SDL2_LIBRARIES}
+        ${SDL2_LIBRARY}
         ${SDL2_IMAGE_LIBRARIES}
     )
 endif()

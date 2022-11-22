@@ -65,9 +65,9 @@ void ysSdlWindowSystem::ProcessMessages() {
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
-                ysWindowSystem::Get()->CloseWindow(window);
+                // TODO: quit
                 break;
-
+            
             // Window events
             case SDL_WINDOWEVENT:
                 switch (event.window.event) {
@@ -86,6 +86,12 @@ void ysSdlWindowSystem::ProcessMessages() {
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEWHEEL:
+            case SDL_JOYBUTTONDOWN:
+            case SDL_JOYBUTTONUP:
+            case SDL_JOYAXISMOTION:
+            case SDL_CONTROLLERBUTTONDOWN:
+            case SDL_CONTROLLERBUTTONUP:
+            case SDL_CONTROLLERAXISMOTION:
                 inputSystem->ProcessEvent(event);
                 break;
 

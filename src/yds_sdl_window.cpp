@@ -8,12 +8,12 @@ ysSdlWindow::~ysSdlWindow() {
     /* void */
 }
 
-ysError ysSdlWindow::InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor, ysContextObject::DeviceAPI api) {
+ysError ysSdlWindow::InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     if (!CheckCompatibility(parent)) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
-    YDS_NESTED_ERROR_CALL(ysWindow::InitializeWindow(parent, title, style, x, y, width, height, monitor, api));
+    YDS_NESTED_ERROR_CALL(ysWindow::InitializeWindow(parent, title, style, x, y, width, height, monitor));
     auto *parentWindow = static_cast<ysSdlWindow *>(parent);
 
     Uint32 flags = 0;
@@ -32,26 +32,12 @@ ysError ysSdlWindow::InitializeWindow(ysWindow *parent, std::string title, Windo
         flags |= SDL_WINDOW_BORDERLESS;
         break;
     case WindowStyle::Unknown:
-        // do nothing
+        flags = 0;
         break;
     }
 
-    switch (api) {
-    case ysContextObject::DeviceAPI::OpenGL4_0:
-        flags |= SDL_WINDOW_OPENGL;
-        break;
-    case ysContextObject::DeviceAPI::Vulkan:
-        flags |= SDL_WINDOW_VULKAN;
-        break;
-//    case ysContextObject::DeviceAPI::Metal:
-//        flags |= SDL_WINDOW_METAL;
-//        flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-//        break;
-    default:
-        break;
-    }
-
-    m_window = SDL_CreateWindow(title.c_str(), x, y, width, height, flags);
+    // TODO: choose between VULKAN and OPENGL here
+    m_window = SDL_CreateWindow(title.c_str(), x, y, width, height, SDL_WINDOW_OPENGL);
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -77,46 +63,16 @@ void ysSdlWindow::SetState(WindowState state) {
         break;
     case WindowState::Closed:
         SDL_DestroyWindow(m_window);
+        break;  
+    case WindowState::Fullscreen:
+        SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN);
         break;
     case WindowState::Unknown:
-        // do nothing
+        SDL_SetWindowFullscreen(m_window, 0);
         break;
     }
-}
 
-bool ysSdlWindow::SetWindowStyle(WindowStyle style) {
-    const bool wasFullscreen = GetWindowStyle() == WindowStyle::Fullscreen;
-
-    if (!ysWindow::SetWindowStyle(style)) return false;
-
-    if (style == WindowStyle::Windowed) {
-        const int width = wasFullscreen ? m_old_width : GetScreenWidth();
-        const int height = wasFullscreen ? m_old_height : GetScreenHeight();
-
-        const int x = GetPositionX();
-        const int y = GetPositionY();
-
-        SetLocation(x, y);
-        SetWindowSize(width, height);
-
-        SDL_SetWindowFullscreen(m_window, 0);
-        SDL_SetWindowSize(m_window, width, height);
-        SDL_RaiseWindow(m_window);
-    } else if (style == WindowStyle::Fullscreen) {
-        m_old_width = GetScreenWidth();
-        m_old_height = GetScreenHeight();
-
-        const int width = m_monitor->GetPhysicalWidth();
-        const int height = m_monitor->GetPhysicalHeight();
-
-        SetLocation(m_monitor->GetOriginX(), m_monitor->GetOriginY());
-        SetWindowSize(width, height);
-
-        SDL_SetWindowSize(m_window, width, height);
-        SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN);
-    }
-
-    return true;
+    m_appliedState = state;
 }
 
 void ysSdlWindow::SetTitle(std::string title) {

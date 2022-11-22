@@ -55,7 +55,7 @@ ysWindow::~ysWindow() {
     /* void */
 }
 
-ysError ysWindow::InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor, ysContextObject::DeviceAPI api) {
+ysError ysWindow::InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     m_width = width;
@@ -71,19 +71,17 @@ ysError ysWindow::InitializeWindow(ysWindow *parent, std::string title, WindowSt
 
     m_monitor = monitor;
 
-    m_api = api;
-
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-ysError ysWindow::InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, ysMonitor *monitor, ysContextObject::DeviceAPI api) {
+ysError ysWindow::InitializeWindow(ysWindow *parent, std::string title, WindowStyle style, ysMonitor *monitor) {
     YDS_ERROR_DECLARE("InitializeWindow");
 
     YDS_NESTED_ERROR_CALL(
         InitializeWindow(
             parent, title, style,
             monitor->GetOriginX(), monitor->GetOriginY(),
-            monitor->GetPhysicalWidth(), monitor->GetPhysicalHeight(), monitor, api));
+            monitor->GetPhysicalWidth(), monitor->GetPhysicalHeight(), monitor));
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -91,7 +89,7 @@ ysError ysWindow::InitializeWindow(ysWindow *parent, std::string title, WindowSt
 void ysWindow::RestoreWindow() {
     WindowState prevWindowState = m_windowState;
 
-    InitializeWindow(m_parent, m_title, m_windowStyle, m_locationx, m_locationy, m_width, m_height, m_monitor, m_api);
+    InitializeWindow(m_parent, m_title, m_windowStyle, m_locationx, m_locationy, m_width, m_height, m_monitor);
     SetState(prevWindowState);
 }
 

@@ -3,7 +3,6 @@
 
 
 #ifdef _WIN32
-#include <Windows.h> // brings in WINGDIAPI for gl.h
 #include <gl/gl.h>
 #include <gl/glext.h>
 #include <gl/wglext.h>

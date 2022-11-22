@@ -56,6 +56,7 @@ void main(void) {
 	ex_Normal = vec3(finalNormal * Transform);
 
 	gl_Position = vec4(inputPos.xyzw);
+	//gl_Position.z = gl_Position.z - 10.0f * (1.0f - DiffuseMix);
 
 	ex_Tex = in_Tex;
 }

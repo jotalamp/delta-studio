@@ -1,12 +1,7 @@
 #ifndef YDS_MATH_H
 #define YDS_MATH_H
 
-#if defined(__ARM_NEON) || defined(__ARM_NEON__)
-#include "sse2neon.h"
-#else
-#include <immintrin.h>
-#endif
-
+#include <xmmintrin.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

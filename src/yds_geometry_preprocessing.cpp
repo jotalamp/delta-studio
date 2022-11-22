@@ -1,5 +1,4 @@
 #include "../include/yds_geometry_preprocessing.h"
-#include "../include/yds_allocator.h"
 
 #include <limits>
 #include <stdlib.h>
@@ -7,8 +6,6 @@
 #include <assert.h>
 #include <float.h>
 #include <limits.h>
-
-static ysVectorAllocation &CalculateHardNormals(ysObjectData* object);
 
 bool ysGeometryPreprocessing::ConnectedFaces(ysObjectData *object, int face1, int face2) {
     for (int i = 0; i < 3; i++) {
@@ -99,7 +96,7 @@ void ysGeometryPreprocessing::ResolveSmoothingGroupAmbiguity(ysObjectData *objec
 }
 
 void ysGeometryPreprocessing::CreateAutomaticSmoothingGroups(ysObjectData *object) {
-    ysVectorAllocation &tempNormals = CalculateHardNormals(object);
+    ysVector *tempNormals = CalculateHardNormals(object);
 
     object->m_extendedSmoothingGroups.Allocate(object->m_objectStatistics.NumFaces);
 
@@ -281,11 +278,11 @@ void ysGeometryPreprocessing::SeparateByUVGroups(ysObjectData *object, int mapCh
     object->m_objectStatistics.NumVertices = object->m_vertices.GetNumObjects();
 }
 
-static ysVectorAllocation &CalculateHardNormals(ysObjectData *object) {
+ysVector *ysGeometryPreprocessing::CalculateHardNormals(ysObjectData *object) {
     if (object->m_hardNormalCache) return object->m_hardNormalCache;
 
-    object->m_hardNormalCache = ysVectorAllocation(object->m_objectStatistics.NumFaces);
-    auto &tempNormals = object->m_hardNormalCache;
+    object->m_hardNormalCache = (ysVector *)aligned_alloc(sizeof(__m128) * object->m_objectStatistics.NumFaces, 16);
+    ysVector *tempNormals = object->m_hardNormalCache;
 
     ysVector vert1, vert2, vert3;
 
@@ -312,8 +309,8 @@ static ysVectorAllocation &CalculateHardNormals(ysObjectData *object) {
 
 void ysGeometryPreprocessing::CalculateNormals(ysObjectData *object) {
     object->m_normals.Allocate(object->m_objectStatistics.NumVertices);
-    ysVectorAllocation &tempNormals = CalculateHardNormals(object);
-    ysVectorAllocation accum(object->m_objectStatistics.NumVertices);
+    ysVector *tempNormals = CalculateHardNormals(object);
+    ysVector *accum = (ysVector *)aligned_alloc(sizeof(__m128) * object->m_objectStatistics.NumVertices, 16);
 
     // Clear accum
     for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
@@ -332,11 +329,13 @@ void ysGeometryPreprocessing::CalculateNormals(ysObjectData *object) {
         ysVector normalSum = ysMath::Normalize(accum[i]);
         object->m_normals[i] = ysMath::GetVector3(normalSum);
     }
+
+    free(accum);
 }
 
-static ysVectorAllocation CalculateHardTangents(ysObjectData *object, int mapChannel) {
-    ysVectorAllocation tempTangents(object->m_objectStatistics.NumFaces);
-    ysVectorAllocation &hardNormals = CalculateHardNormals(object);
+ysVector *ysGeometryPreprocessing::CalculateHardTangents(ysObjectData *object, int mapChannel) {
+    ysVector *tempTangents = (ysVector *)aligned_alloc(sizeof(__m128) * object->m_objectStatistics.NumFaces, 16);
+    ysVector *hardNormals = CalculateHardNormals(object);
 
     ysVector vert1, vert2, vert3;
 
@@ -397,7 +396,7 @@ static ysVectorAllocation CalculateHardTangents(ysObjectData *object, int mapCha
 }
 
 void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapChannel) {
-    ysVectorAllocation tempTangents = CalculateHardTangents(object, mapChannel);
+    ysVector *tempTangents = CalculateHardTangents(object, mapChannel);
 
     // Separate Faces With Discontinuous Tangents
     ysExpandingArray<int, 4> m_discontinuousFaces;
@@ -434,7 +433,7 @@ void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapCha
 
     // Find smoothed tangents
     object->m_tangents.Allocate(object->m_vertices.GetNumObjects());
-    ysVectorAllocation accum(object->m_objectStatistics.NumVertices);
+    ysVector *accum = (ysVector *)aligned_alloc(sizeof(__m128) * object->m_objectStatistics.NumVertices, 16);
 
     // Clear accum
     for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
@@ -459,6 +458,9 @@ void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapCha
         object->m_tangents[i] = ysMath::GetVector4(vec);
         object->m_tangents[i].w = ysMath::GetW(accum[i]);
     }
+
+    free(accum);
+    free(tempTangents);
 }
 
 void ysGeometryPreprocessing::SortBoneWeights(ysObjectData *object, bool normalize, int maxBoneCount) {

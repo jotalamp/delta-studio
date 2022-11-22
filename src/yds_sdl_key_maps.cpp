@@ -41,10 +41,6 @@ const ysKey::Code *ysKeyMaps::GetSdlKeyMap() {
         m_sdlKeyMap[SDL_SCANCODE_3] = ysKey::Code::N3;
         m_sdlKeyMap[SDL_SCANCODE_4] = ysKey::Code::N4;
         m_sdlKeyMap[SDL_SCANCODE_5] = ysKey::Code::N5;
-        m_sdlKeyMap[SDL_SCANCODE_6] = ysKey::Code::N6;
-        m_sdlKeyMap[SDL_SCANCODE_7] = ysKey::Code::N7;
-        m_sdlKeyMap[SDL_SCANCODE_8] = ysKey::Code::N8;
-        m_sdlKeyMap[SDL_SCANCODE_9] = ysKey::Code::N9;
 
         m_sdlKeyMap[SDL_SCANCODE_UP] = ysKey::Code::Up;
         m_sdlKeyMap[SDL_SCANCODE_DOWN] = ysKey::Code::Down;

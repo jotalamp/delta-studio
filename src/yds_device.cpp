@@ -1,6 +1,5 @@
 #include "../include/yds_device.h"
 
-ysDevice::Registry ysDevice::s_registry;
 
 ysDevice::ysDevice() : ysContextObject("API_DEVICE", DeviceAPI::Unknown) {
     for (int i = 0; i < MaxRenderTargets; ++i) m_activeRenderTarget[i] = nullptr;
@@ -38,13 +37,34 @@ ysError ysDevice::CreateDevice(ysDevice **newDevice, DeviceAPI API) {
     YDS_ERROR_DECLARE("CreateDevice");
 
     if (newDevice == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
+    *newDevice = nullptr;
 
-    if (!s_registry.Has(API)) {
-        *newDevice = nullptr;
-        return YDS_ERROR_RETURN_STATIC(ysError::NoPlatform);
+    if (API == DeviceAPI::Unknown) return YDS_ERROR_RETURN_STATIC(ysError::InvalidParameter);
+
+    switch(API) {
+    case DeviceAPI::DirectX10:
+#if PLATFORM_WIN32
+        *newDevice = CreateApiDevice<DeviceAPI::DirectX10>();
+#endif
+        break;
+    case DeviceAPI::DirectX11:
+#if PLATFORM_WIN32
+        *newDevice = CreateApiDevice<DeviceAPI::DirectX11>();
+#endif
+        break;
+    case DeviceAPI::OpenGL4_0:
+#if PLATFORM_SDL
+        *newDevice = CreateApiDevice<DeviceAPI::OpenGL4_0>();
+#endif
+        break;
+    case DeviceAPI::Vulkan:
+#if PLATFORM_WIN32
+        *newDevice = CreateApiDevice<DeviceAPI::Vulkan>();
+#endif
+        break;
     }
 
-    *newDevice = s_registry.New(API);;
+    if (*newDevice == nullptr) return YDS_ERROR_RETURN_STATIC(ysError::NoPlatform);
 
     return YDS_ERROR_RETURN_STATIC(ysError::None);
 }
