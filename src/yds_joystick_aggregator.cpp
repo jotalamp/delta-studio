@@ -64,6 +64,26 @@ int ysJoystickAggregator::GetZ() const {
     return aggregateZ;
 }
 
+int ysJoystickAggregator::GetRX() const {
+    int aggregateRX = 0;
+    const int joystickCount = m_joystick.GetNumObjects();
+    for (int i = 0; i < joystickCount; ++i) {
+        aggregateRX += m_joystick[i]->GetRX();
+    }
+
+    return aggregateRX;
+}
+
+int ysJoystickAggregator::GetRY() const {
+    int aggregateRY = 0;
+    const int joystickCount = m_joystick.GetNumObjects();
+    for (int i = 0; i < joystickCount; ++i) {
+        aggregateRY += m_joystick[i]->GetRY();
+    }
+
+    return aggregateRY;
+}
+
 int ysJoystickAggregator::GetWheel() const {
     int aggregateWheel = 0;
     const int joystickCount = m_joystick.GetNumObjects();

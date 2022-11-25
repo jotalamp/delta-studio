@@ -112,7 +112,8 @@ namespace dbasic {
         bool ProcessJoystickButtonUp(ysJoystick::Button button);
         bool IsJoystickButtonDown(ysJoystick::Button button);
         void GetJoystickAxes(int *x, int *y, int *z);
-        //void GetJoystickAxeZ(int *z);
+        int GetJoystickAxisRX();
+        int GetJoystickAxisRY();
 
         int GetMouseWheel();
         void GetMousePos(int *x, int *y);

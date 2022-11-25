@@ -33,8 +33,9 @@ public:
     virtual ~ysJoystick();
 
     void Reset();
-    void UpdatePosition(int x, int y, int z, bool delta = true);
-    //void UpdatePositionZ(int z, bool delta = true);
+    void UpdatePosition(int x, int y, int z, int rx, int ry, bool delta = true);
+    void UpdatePositionRX(int rx, bool delta = true);
+    void UpdatePositionRY(int ry, bool delta = true);
     void UpdateButton(Button button, ButtonState state);
     void SetOsPosition(int x, int y, int z);
 
@@ -45,6 +46,8 @@ public:
     virtual int GetX() const { return m_x; }
     virtual int GetY() const { return m_y; }
     virtual int GetZ() const { return m_z; }
+    virtual int GetRX() const { return m_rx; }
+    virtual int GetRY() const { return m_ry; }
     virtual int GetWheel() const { return m_wheel; }
     virtual bool IsDown(Button button) const;
 
@@ -54,6 +57,8 @@ protected:
     int m_x;
     int m_y;
     int m_z;
+    int m_rx;
+    int m_ry;
     int m_wheel;
 
     int m_osPosition_x;

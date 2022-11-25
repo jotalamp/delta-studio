@@ -76,33 +76,19 @@ void ysSdlInputSystem::ProcessEvent(const SDL_Event &event) {
             ysJoystick *joystick = GetJoystick();
             auto &controllerEvent = event.caxis;
             switch(controllerEvent.axis) {
-                //case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: mouse->UpdateWheel(controllerEvent.value/32800.0f - mouse->GetWheel()); break;
-                case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: joystick->UpdatePosition(controllerEvent.value, joystick->GetY(), joystick->GetZ(), false); break;
-                case SDL_CONTROLLER_AXIS_LEFTX       : joystick->UpdatePosition(joystick->GetX(), joystick->GetY(), controllerEvent.value, false); break;
-                case SDL_CONTROLLER_AXIS_TRIGGERLEFT : joystick->UpdatePosition(joystick->GetX(), controllerEvent.value, joystick->GetZ(), false); break;
-                //case SDL_CONTROLLER_AXIS_TRIGGERLEFT : joystick->UpdatePositionZ(controllerEvent.value, false); break;
-                //case SDL_CONTROLLER_AXIS_LEFTX       : joystick->UpdatePositionZ(controllerEvent.value, false); break;
-                //case SDL_CONTROLLER_AXIS_LEFTX: mouse->UpdatePosition(controllerEvent.value/32000.0f, mouse->GetY()); break;
-                //case SDL_CONTROLLER_AXIS_LEFTY: mouse->UpdatePosition(mouse->GetX(), controllerEvent.value); break;
+                case SDL_CONTROLLER_AXIS_RIGHTX         : joystick->UpdatePositionRX(controllerEvent.value, false); break;
+                case SDL_CONTROLLER_AXIS_RIGHTY         : joystick->UpdatePositionRY(controllerEvent.value, false); break;
+                case SDL_CONTROLLER_AXIS_TRIGGERRIGHT   : joystick->UpdatePosition(controllerEvent.value,   joystick->GetY(),   joystick->GetZ(),       joystick->GetRX(),      joystick->GetRY(),      false); break;
+                case SDL_CONTROLLER_AXIS_LEFTX          : joystick->UpdatePosition(joystick->GetX(),        joystick->GetY(),   controllerEvent.value,  joystick->GetRX(),      joystick->GetRY(),      false); break;
+                case SDL_CONTROLLER_AXIS_TRIGGERLEFT    : joystick->UpdatePosition(joystick->GetX(),    controllerEvent.value,  joystick->GetZ(),       joystick->GetRX(),      joystick->GetRY(),      false); break;
             }
             break;
         }
-        /*
-        case SDL_JOYAXISMOTION: {
-            ysMouse *mouse = GetMouse();
-            auto &joystickEvent = event.jaxis;
-            switch(joystickEvent.axis) {
-                case 5: mouse->UpdateWheel(0.2f * joystickEvent.value - mouse->GetWheel()); break;
-                case 2: mouse->UpdatePosition(joystickEvent.value/32000.0f, mouse->GetY()); break;
-                case 1: mouse->UpdatePosition(mouse->GetY(), joystickEvent.value); break;
-            }
-            break;
-        }*/
+
         case SDL_CONTROLLERBUTTONDOWN:
         case SDL_CONTROLLERBUTTONUP:
         {
             auto &joystickEvent = event.cbutton;
-            //ysMouse *mouse = GetMouse();
             ysJoystick *joystick = GetJoystick();
             
             ysJoystick::Button button;
@@ -121,53 +107,14 @@ void ysSdlInputSystem::ProcessEvent(const SDL_Event &event) {
             }
 
             if(joystickEvent.state == SDL_PRESSED) {
-                //printf("Button %i pressed \n", joystickEvent.button);
                 joystick->UpdateButton(button, ysJoystick::ButtonState::DownTransition);
             }
 
             if(joystickEvent.state == SDL_RELEASED){
-                //printf("Button %i released\n", joystickEvent.button);
                 joystick->UpdateButton(button, ysJoystick::ButtonState::UpTransition);
             }
             break;
         }
-        /*
-        case SDL_JOYBUTTONUP:
-        case SDL_JOYBUTTONDOWN:
-        {
-            auto &joystickEvent = event.jbutton;
-            //auto &joystickEvent = event.cbutton;
-            ysKeyboard *keyboard = GetKeyboard();
-            ysMouse *mouse = GetMouse();
-            
-            ysMouse::Button button;
-            switch(joystickEvent.button) {
-                case  0: button = ysMouse::Button::Aux_00; break;
-                case  1: button = ysMouse::Button::Aux_01; break;
-                case  2: button = ysMouse::Button::Aux_02; break;
-                case  3: button = ysMouse::Button::Aux_03; break;
-                case  4: button = ysMouse::Button::Aux_04; break;
-                case  5: button = ysMouse::Button::Aux_05; break;
-                case  6: button = ysMouse::Button::Aux_06; break;
-                case  7: button = ysMouse::Button::Aux_07; break;
-                case  8: button = ysMouse::Button::Aux_08; break;
-                case  9: button = ysMouse::Button::Aux_09; break;
-                case 10: button = ysMouse::Button::Aux_10; break;
-            }
-
-            if(joystickEvent.state == SDL_PRESSED) {
-                printf("Button %i pressed \n", joystickEvent.button);
-                mouse->UpdateButton(button, ysMouse::ButtonState::DownTransition);
-            }
-
-            if(joystickEvent.state == SDL_RELEASED){
-                printf("Button %i released\n", joystickEvent.button);
-                mouse->UpdateButton(button, ysMouse::ButtonState::UpTransition);
-            }
-            break;
-        }*/
-        
-
         default:
             // Ignore it
             break;
