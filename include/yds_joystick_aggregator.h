@@ -22,6 +22,8 @@ public:
     virtual int GetX() const;
     virtual int GetY() const;
     virtual int GetZ() const;
+    virtual int GetRX() const;
+    virtual int GetRY() const;
     virtual int GetWheel() const;
     virtual bool IsDown(Button button) const;
 

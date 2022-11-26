@@ -1,7 +1,17 @@
 #include "../include/yds_joystick.h"
+#include <stdio.h>
 
 ysJoystick::ysJoystick() {
     Reset();
+     m_x = 0;
+    m_y = 0;
+    m_z = 0;
+    m_rx = 0;
+    m_ry = 0;
+    m_wheel = 0;
+
+    m_osPosition_x = 0;
+    m_osPosition_y = 0;
 }
 
 ysJoystick::~ysJoystick() {
@@ -20,28 +30,41 @@ void ysJoystick::Reset() {
     m_osPosition_y = 0;
 }
 
-void ysJoystick::UpdatePosition(int x, int y, int z, bool delta) {
+void ysJoystick::UpdatePosition(int x, int y, int z, int rx, int ry, bool delta) {
     if (delta) {
         m_x += x;
         m_y += y;
         m_z += z;
+        m_rx += rx;
+        m_ry += ry;
     }
     else {
         m_x = x;
         m_y = y;
         m_z = z;
+        m_rx = rx;
+        m_ry = ry;
     }
 }
-/*
-void ysJoystick::UpdatePositionZ(int z, bool delta) {
+
+void ysJoystick::UpdatePositionRX(int rx, bool delta) {
     if (delta) {
-        m_z += z;
+        m_rx += rx;
     }
     else {
-        m_z = z;
+        m_rx = rx;
     }
 }
-*/
+
+void ysJoystick::UpdatePositionRY(int ry, bool delta) {
+    if (delta) {
+        m_ry += ry;
+    }
+    else {
+        m_ry = ry;
+    }
+}
+
 void ysJoystick::UpdateButton(Button button, ButtonState state) {
     m_buttonStates[(int)button] = state;
 }

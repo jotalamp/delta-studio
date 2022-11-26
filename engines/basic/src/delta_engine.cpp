@@ -685,15 +685,23 @@ void dbasic::DeltaEngine::GetJoystickAxes(int *x, int *y, int *z)
         }
     }
 }
-/*
-void dbasic::DeltaEngine::GetJoystickAxeZ(int *z)
+
+int dbasic::DeltaEngine::GetJoystickAxisRX()
 {
-    if (z != nullptr)
-    {
-        *z = m_mainJoystick->GetZ();
-    }
+    if (m_mainJoystick != nullptr)
+        return m_mainJoystick->GetRX();
+    else
+        return 0;
 }
-*/
+
+int dbasic::DeltaEngine::GetJoystickAxisRY()
+{
+    if (m_mainJoystick != nullptr)
+        return m_mainJoystick->GetRY();
+    else
+        return 0;
+}
+
 int dbasic::DeltaEngine::GetMouseWheel()
 {
     if (m_mainMouse != nullptr)

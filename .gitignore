@@ -348,6 +348,3 @@ ASALocalRun/
 
 # Ignore user's workspace
 workspace/
-
-# Ignore VSCode dir
-.vscode/
